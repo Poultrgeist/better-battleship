@@ -20,6 +20,9 @@ onready var _health_system = $Health
 func _ready():
 	target_pos = Vector2(-10, -100)
 	_init_health()
+	$Game.connect("start_turn", self, "_on_Game_start_turn")
+	$Game.connect("start_sim", self, "_on_Game_start_sim")
+	$Game.connect("end_sim", self, "_on_Game_end_sim")
 
 func turn_reset():
 	state = IDLE
@@ -87,7 +90,7 @@ func _integrate_forces(physics_state):
 			#print("small angle: ", angle_to_point)
 		else:
 			# When not close to wanted angle, add max force
-			set_angular_velocity(spin_dir * spin_speed / physics_state.get_step() * 0.02)
+			set_angular_velocity(spin_dir * spin_speed / physics_state.get_step() * 0.01)
 		
 func look_follow(physics_state, current_transform, target_position):
 	
@@ -106,3 +109,7 @@ func _init_health():
 	_health_system.set_max_health(max_health)
 	_health_system.reset_health()
 
+
+
+func _on_Game_start_turn():
+	pass # Replace with function body.
