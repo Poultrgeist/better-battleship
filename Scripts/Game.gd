@@ -10,44 +10,49 @@ var ships = []
 enum {DEFAULT, SIM, INPUT}
 var state = DEFAULT
 
+signal start_turn
 signal start_sim
 signal end_sim
-signal start_turn
+
 
 func _ready():
 	_init_ships()
-	_set_turn()
+	_start_turn()
 
-func _set_turn():
+func _start_turn():
 	# Allow ships to set vectors
+	state = INPUT
 	emit_signal("start_turn")
-	pass
+	
 
-func _move_turn():
+func _start_sim():
 	# Set ships and turrets to move state
+	state = SIM
 	emit_signal("start_sim")
-	pass
+	
 
-func _end_turn():
-	emit_signal("end_sim")
+func _end_sim():
 	# set state to default, 
+	state = DEFAULT
+	emit_signal("end_sim")
+	
 	# Set ships to idle, stop timer?
-	for ship in ships:
-		ship.turn_reset()
+#	for ship in ships:
+#		ship.turn_reset()
 		
 	# Decide if game is over
 	
 	# Update things
 	
 	# run set turn
-	_set_turn()
+	_start_turn()
 
 func _input(event):
 	if Input.is_action_just_released("ui_accept"):
 		if state == INPUT:
-			_move_turn()
+			_start_sim()
 		elif state == SIM:
-			_end_turn()
+			_end_sim()
 
 func _init_ships():
 	var children : Array = get_children()
