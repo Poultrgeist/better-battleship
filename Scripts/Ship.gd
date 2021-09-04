@@ -16,12 +16,15 @@ enum {INIT, IDLE, MOVING, INVULNERABLE, DEAD}
 var state = INIT
 
 onready var _health_system = $Health
+onready var _line2D = $Line2D
 onready var Game = get_node("/root/Game")
 
 func _ready():
-	target_pos = Vector2(-10, -100)
+	target_pos = Vector2.ZERO
 	_init_health()
 	_connect_signals()
+	_line2D.add_point(get_position())
+	_line2D.add_point(get_position())
 
 #func turn_reset():
 #	state = IDLE
@@ -34,14 +37,21 @@ func _process(delta):
 	thrust = Vector2()
 	spin_dir = 0
 	
-	if state == MOVING:
+	if state == IDLE:
+		_line2D.set_rotation(-get_rotation())
+		_line2D.set_point_position(0, Vector2.ZERO)
+		if target_pos != Vector2.ZERO:
+			_line2D.set_point_position(1, target_pos - get_position())
+	elif state == MOVING:
 		thrust = Vector2(speed, 0)
-		spin_dir = sign(linear_velocity.angle_to(self.position.direction_to(target_pos)))
+		spin_dir = sign(linear_velocity.angle_to(get_position().direction_to(target_pos)))
 
 func _input(event):
 	if (event is InputEventMouseButton && event.is_pressed() && event.button_index == BUTTON_LEFT):
-		target_pos = get_global_mouse_position()
-		print("target set: ", target_pos)
+		var mouse_pos = get_global_mouse_position()
+		if mouse_pos != Vector2.ZERO:
+			target_pos = mouse_pos
+			print("target set: ", target_pos)
 
 func _on_TurnTimer_timeout():
 	state = IDLE
@@ -51,28 +61,29 @@ func _integrate_forces(physics_state):
 	set_applied_force(thrust.rotated(rotation))
 	
 	if state == IDLE:
+		# slows velocity to 0
 		if (linear_velocity.length_squared() == 0):
 			pass
 		elif (linear_velocity.length_squared() < 0.01):
 			linear_velocity = Vector2(0, 0)
 		else:
 			add_central_force(-linear_velocity * 4)
-
+		
+		# slows angular_velocity to 0, prob can use some curve for this
 		if (angular_velocity == 0):
 			set_applied_torque(0)
 		elif (angular_velocity < 0.1):
 			angular_velocity = 0
 		else:
-			add_torque(-angular_velocity * 2)
-			print("ERROR: flipping")
+			add_torque(-angular_velocity * 6) # change to set velo?
 			
 	if state == MOVING:
 		var right_dir = Vector2(1, 0)
-		var angle_to_point = right_dir.rotated(rotation).angle_to(self.position.direction_to(target_pos))
+		var angle_to_point = right_dir.rotated(rotation).angle_to(get_position().direction_to(target_pos))
 		if (abs(angle_to_point) < 0.01):
 			# Point at the target
 			set_applied_torque(0)
-			look_follow(physics_state, self.position, target_pos)
+			look_follow(physics_state, get_position(), target_pos)
 		elif (abs(angle_to_point) < 0.25):
 			# Reduce speed
 			set_angular_velocity(angle_to_point / physics_state.get_step() * 0.02)
@@ -97,9 +108,11 @@ func _connect_signals():
 
 func _on_Game_start_turn():
 	state = IDLE
-
+	_line2D.set_visible(true)
+	
 func _on_Game_start_sim():
 	state = MOVING
+	_line2D.set_visible(false)
 
 func _on_Game_end_sim():
 	state = IDLE
