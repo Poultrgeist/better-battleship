@@ -16,15 +16,12 @@ enum {INIT, IDLE, MOVING, INVULNERABLE, DEAD}
 var state = INIT
 
 onready var _health_system = $Health
-onready var _line2D = $Line2D
 onready var Game = get_node("/root/Game")
 
 func _ready():
 	target_pos = Vector2.ZERO
 	_init_health()
 	_connect_signals()
-	_line2D.add_point(get_position())
-	_line2D.add_point(get_position())
 
 #func turn_reset():
 #	state = IDLE
@@ -37,12 +34,7 @@ func _process(delta):
 	thrust = Vector2()
 	spin_dir = 0
 	
-	if state == IDLE:
-		_line2D.set_rotation(-get_rotation())
-		_line2D.set_point_position(0, Vector2.ZERO)
-		if target_pos != Vector2.ZERO:
-			_line2D.set_point_position(1, target_pos - get_position())
-	elif state == MOVING:
+	if state == MOVING:
 		thrust = Vector2(speed, 0)
 		spin_dir = sign(linear_velocity.angle_to(get_position().direction_to(target_pos)))
 
@@ -108,11 +100,9 @@ func _connect_signals():
 
 func _on_Game_start_turn():
 	state = IDLE
-	_line2D.set_visible(true)
 	
 func _on_Game_start_sim():
 	state = MOVING
-	_line2D.set_visible(false)
 
 func _on_Game_end_sim():
 	state = IDLE
