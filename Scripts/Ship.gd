@@ -12,6 +12,7 @@ var turrets : Array
 var target_pos : Vector2
 var thrust : Vector2 = Vector2()
 var spin_dir : int = 0
+var selected : bool = false
 enum {INIT, IDLE, MOVING, INVULNERABLE, DEAD}
 var state = INIT
 

@@ -13,7 +13,7 @@ var state = DEFAULT
 signal start_turn
 signal start_sim
 signal end_sim
-
+signal mouse_click(selected_ship)
 
 func _ready():
 	_init_ships()
@@ -53,6 +53,9 @@ func _input(event):
 			_start_sim()
 		elif state == SIM:
 			_end_sim()
+	
+	if (event is InputEventMouseButton && event.is_pressed() && event.button_index == BUTTON_LEFT):
+		if mouse_pos
 
 func _init_ships():
 	var children : Array = get_children()
