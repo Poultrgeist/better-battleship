@@ -83,7 +83,7 @@ func _integrate_forces(physics_state):
 		else:
 			# When not close to wanted angle, add max force
 			set_angular_velocity(spin_dir * spin_speed / physics_state.get_step() * 0.01)
-		
+
 func look_follow(physics_state, current_transform, target_position):
 	# Points rigidbody directly at a point
 	var right_dir = Vector2(1, 0)
@@ -107,4 +107,5 @@ func _on_Game_start_sim():
 
 func _on_Game_end_sim():
 	state = IDLE
+
 

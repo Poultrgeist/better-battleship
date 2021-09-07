@@ -54,8 +54,8 @@ func _input(event):
 		elif state == SIM:
 			_end_sim()
 	
-	if (event is InputEventMouseButton && event.is_pressed() && event.button_index == BUTTON_LEFT):
-		if mouse_pos
+#	if (event is InputEventMouseButton && event.is_pressed() && event.button_index == BUTTON_LEFT):
+#		if mouse_pos
 
 func _init_ships():
 	var children : Array = get_children()
